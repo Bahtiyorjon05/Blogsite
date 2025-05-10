@@ -1,0 +1,245 @@
+{% extends 'blog/base.html' %}
+{% load static %}
+
+{% block title %}{{ user.username }}'s Profile | PyBlog{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Profile Header -->
+    <div class="card border-0 shadow-sm mb-4 overflow-hidden">
+        <div class="position-relative">
+            <!-- Cover Image -->
+            <div class="profile-cover" style="height: 200px; background-color: var(--bs-primary-bg-subtle);">
+                {% if profile.cover_image %}
+                    <img src="{{ profile.cover_image.url }}" alt="Cover Image" class="w-100 h-100 object-fit-cover">
+                {% endif %}
+            </div>
+            
+            <!-- Avatar -->
+            <div class="position-absolute" style="bottom: -50px; left: 30px;">
+                <div class="position-relative">
+                    {% if profile.avatar %}
+                        <img src="{{ profile.avatar.url }}" alt="{{ user.username }}" class="rounded-circle border border-4 border-white" width="100" height="100">
+                    {% else %}
+                        <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center border border-4 border-white" style="width: 100px; height: 100px;">
+                            <i class="fas fa-user fa-2x text-primary"></i>
+                        </div>
+                    {% endif %}
+                    
+                    {% if request.user == user %}
+                        <a href="{% url 'edit_profile' %}" class="position-absolute bottom-0 end-0 bg-white rounded-circle shadow-sm p-2" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-camera text-primary"></i>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="card-body pt-5 mt-3">
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+                <div>
+                    <h3 class="fw-bold mb-1">{{ user.get_full_name|default:user.username }}</h3>
+                    <p class="text-muted mb-0">@{{ user.username }}</p>
+                </div>
+                {% if request.user == user %}
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'edit_profile' %}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-edit me-1"></i> Edit Profile
+                        </a>
+                        <a href="{% url 'dashboard' %}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-tachometer-alt me-1"></i> Dashboard
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+            
+            {% if profile.bio %}
+                <p class="mb-3">{{ profile.bio }}</p>
+            {% endif %}
+            
+            <div class="d-flex flex-wrap gap-3 mb-3">
+                {% if profile.website %}
+                    <a href="{{ profile.website }}" target="_blank" class="text-decoration-none text-muted">
+                        <i class="fas fa-globe me-1"></i> {{ profile.website|cut:"https://"|cut:"http://" }}
+                    </a>
+                {% endif %}
+                {% if profile.location %}
+                    <span class="text-muted">
+                        <i class="fas fa-map-marker-alt me-1"></i> {{ profile.location }}
+                    </span>
+                {% endif %}
+                <span class="text-muted">
+                    <i class="fas fa-calendar me-1"></i> Joined {{ user.date_joined|date:"F Y" }}
+                </span>
+            </div>
+            
+            <!-- Stats Cards -->
+            <div class="row g-3 mb-0">
+                <div class="col-md-4">
+                    <div class="card border-0 bg-light h-100">
+                        <div class="card-body text-center">
+                            <h4 class="mb-0 fw-bold">{{ user_posts.count }}</h4>
+                            <p class="text-muted mb-0">Posts</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 bg-light h-100">
+                        <div class="card-body text-center">
+                            <h4 class="mb-0 fw-bold">{{ total_likes }}</h4>
+                            <p class="text-muted mb-0">Likes</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 bg-light h-100">
+                        <div class="card-body text-center">
+                            <h4 class="mb-0 fw-bold">{{ total_comments }}</h4>
+                            <p class="text-muted mb-0">Comments</p>
+                        </div>
+                                        </div>
+                                        <div class="card-footer bg-transparent border-0 d-flex justify-content-between align-items-center">
+                                            <a href="{% url 'post_detail' post.slug %}" class="btn btn-sm btn-outline-primary">Read More</a>
+                                            <div class="d-flex gap-3">
+                                                <small class="text-muted"><i class="far fa-eye me-1"></i> {{ post.views }}</small>
+                                                <small class="text-muted"><i class="far fa-heart me-1"></i> {{ post.total_likes }}</small>
+                                                <small class="text-muted"><i class="far fa-comment me-1"></i> {{ post.total_comments }}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <div class="mb-4">
+                                <i class="fas fa-file-alt fa-4x text-muted"></i>
+                            </div>
+                            <h5>No posts yet</h5>
+                            <p class="text-muted">This user hasn't published any posts</p>
+                            {% if request.user == user %}
+                                <a href="{% url 'create_post' %}" class="btn btn-primary mt-2">Write your first post</a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Liked Posts Tab -->
+                <div class="tab-pane fade" id="liked-content" role="tabpanel" aria-labelledby="liked-tab">
+                    {% if liked_posts %}
+                        <div class="row g-4">
+                            {% for post in liked_posts %}
+                                <div class="col-lg-6">
+                                    <div class="card h-100 border-0 shadow-sm">
+                                        {% if post.featured_image %}
+                                            <img src="{{ post.featured_image.url }}" class="card-img-top" alt="{{ post.title }}" style="height: 200px; object-fit: cover;">
+                                        {% else %}
+                                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                                <i class="fas fa-image fa-3x text-muted"></i>
+                                            </div>
+                                        {% endif %}
+                                        <div class="card-body">
+                                            {% if post.category %}
+                                                <a href="{% url 'category_posts' post.category.slug %}" class="badge bg-primary bg-opacity-10 text-primary text-decoration-none mb-2">{{ post.category.name }}</a>
+                                            {% endif %}
+                                            <h5 class="card-title mb-2">
+                                                <a href="{% url 'post_detail' post.slug %}" class="text-decoration-none text-dark">{{ post.title }}</a>
+                                            </h5>
+                                            <div class="d-flex align-items-center mb-3">
+                                                <div class="me-2">
+                                                    {% if post.author.userprofile.avatar %}
+                                                        <img src="{{ post.author.userprofile.avatar.url }}" alt="{{ post.author.username }}" class="rounded-circle" width="24" height="24">
+                                                    {% else %}
+                                                        <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" style="width: 24px; height: 24px;">
+                                                            <i class="fas fa-user text-primary" style="font-size: 12px;"></i>
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                                <span class="text-muted small">{{ post.author.username }}</span>
+                                                <span class="text-muted small ms-auto"><i class="far fa-calendar me-1"></i> {{ post.date_created|date:"M d, Y" }}</span>
+                                            </div>
+                                            <p class="card-text mb-3">{{ post.excerpt|default:post.content|truncatewords:15 }}</p>
+                                        </div>
+                                        <div class="card-footer bg-transparent border-0 d-flex justify-content-between align-items-center">
+                                            <a href="{% url 'post_detail' post.slug %}" class="btn btn-sm btn-outline-primary">Read More</a>
+                                            <div class="d-flex gap-3">
+                                                <small class="text-muted"><i class="far fa-eye me-1"></i> {{ post.views }}</small>
+                                                <small class="text-muted"><i class="far fa-heart me-1"></i> {{ post.total_likes }}</small>
+                                                <small class="text-muted"><i class="far fa-comment me-1"></i> {{ post.total_comments }}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <div class="mb-4">
+                                <i class="fas fa-heart fa-4x text-muted"></i>
+                            </div>
+                            <h5>No liked posts yet</h5>
+                            <p class="text-muted">Posts liked by this user will appear here</p>
+                            <a href="{% url 'post_list' %}" class="btn btn-primary mt-2">Browse posts</a>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Comments Tab -->
+                <div class="tab-pane fade" id="comments-content" role="tabpanel" aria-labelledby="comments-tab">
+                    {% if user_comments %}
+                        <div class="row g-4">
+                            {% for comment in user_comments %}
+                                <div class="col-lg-6">
+                                    <div class="card border-0 shadow-sm h-100">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                                <span class="badge bg-light text-dark">{{ comment.date_created|date:"M d, Y" }}</span>
+                                                <a href="{% url 'post_detail' comment.post.slug %}#comment-{{ comment.id }}" class="text-decoration-none">View</a>
+                                            </div>
+                                            <h6 class="card-subtitle mb-2 text-muted">On <a href="{% url 'post_detail' comment.post.slug %}" class="text-decoration-none">{{ comment.post.title }}</a></h6>
+                                            <p class="card-text">{{ comment.content }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <div class="mb-4">
+                                <i class="fas fa-comments fa-4x text-muted"></i>
+                            </div>
+                            <h5>No comments yet</h5>
+                            <p class="text-muted">Comments made by this user will appear here</p>
+                            <a href="{% url 'post_list' %}" class="btn btn-primary mt-2">Browse posts to comment</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+    // Initialize tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-tooltip]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+    
+    // Initialize date pickers
+    flatpickr(".date-picker", {
+        dateFormat: "Y-m-d",
+        altInput: true,
+        altFormat: "F j, Y",
+        wrap: true
+    });
+</script>
+{% endblock %}

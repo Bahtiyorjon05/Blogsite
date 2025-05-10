@@ -1,0 +1,252 @@
+/* Authentication Forms CSS - Isolated from main styles with VIBRANT COLORS */
+:root {
+  --primary-color: #4361ee; /* Vibrant blue */
+  --primary-light: #4cc9f0; /* Light blue */
+  --primary-dark: #3a0ca3; /* Deep purple */
+  --secondary-color: #2b2d42; /* Dark navy */
+  --accent-color: #f72585; /* Hot pink */
+  --light-color: #ffffff; /* Pure white */
+  --dark-color: #212529; /* Almost black */
+  --success-color: #06d6a0; /* Bright teal */
+  --danger-color: #ef233c; /* Bright red */
+  --border-radius: 10px;
+  --card-bg: #ffffff; /* White background */
+  --text-color: #2b2d42; /* Dark text */
+  --input-bg: #f8f9fa; /* Light gray input background */
+  --input-border: #4361ee; /* Blue border */
+  --input-focus-shadow: rgba(67, 97, 238, 0.4); /* Blue shadow */
+}
+
+/* Basic form elements with VIBRANT STYLING */
+.auth-form input[type="text"],
+.auth-form input[type="email"],
+.auth-form input[type="password"],
+.auth-form textarea,
+.auth-form select {
+  display: block;
+  width: 100%;
+  padding: 14px 18px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--text-color);
+  background-color: var(--input-bg);
+  border: 2px solid var(--input-border);
+  border-radius: 8px;
+  transition: all 0.2s ease-in-out;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  font-weight: 500;
+}
+
+.auth-form input:hover,
+.auth-form textarea:hover,
+.auth-form select:hover {
+  border-color: var(--primary-light);
+  background-color: var(--light-color);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.auth-form input:focus,
+.auth-form textarea:focus,
+.auth-form select:focus {
+  border-color: var(--primary-color);
+  outline: 0;
+  box-shadow: 0 0 0 4px var(--input-focus-shadow);
+  background-color: var(--light-color);
+}
+
+/* Form layout - ENHANCED */
+.auth-form {
+  margin-bottom: 24px;
+  position: relative;
+  z-index: 10;
+}
+
+.auth-form .form-label {
+  display: block;
+  margin-bottom: 12px;
+  font-weight: 700;
+  color: var(--primary-dark);
+  font-size: 18px;
+  letter-spacing: 0.5px;
+}
+
+.auth-form .mb-4 {
+  margin-bottom: 24px;
+}
+
+/* Buttons - BOLD AND VIBRANT */
+.auth-form .btn {
+  display: inline-block;
+  font-weight: 700;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  user-select: none;
+  border: none;
+  padding: 16px 32px;
+  font-size: 18px;
+  line-height: 1.5;
+  border-radius: 8px;
+  transition: all 0.3s ease-in-out;
+  cursor: pointer;
+  position: relative;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.auth-form .btn-primary {
+  background: linear-gradient(45deg, var(--primary-color), var(--primary-light));
+  color: white;
+  border: none;
+}
+
+.auth-form .btn-primary:hover {
+  background: linear-gradient(45deg, var(--primary-dark), var(--primary-color));
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(67, 97, 238, 0.4);
+}
+
+.auth-form .btn-lg {
+  padding: 12px 24px;
+  font-size: 18px;
+}
+
+/* Card styling - BOLD AND VIBRANT */
+.auth-card {
+  background-color: var(--card-bg);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(67, 97, 238, 0.1);
+  overflow: hidden;
+  border: none;
+  position: relative;
+  z-index: 100;
+  transform: translateZ(0);
+}
+
+/* Add a subtle gradient border */
+.auth-card:before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+  z-index: -1;
+  border-radius: 18px;
+  opacity: 0.7;
+}
+
+.auth-card .card-body {
+  padding: 40px;
+  background-color: var(--card-bg);
+  border-radius: 16px;
+}
+
+/* Checkbox */
+.auth-form .form-check {
+  padding-left: 24px;
+  position: relative;
+}
+
+.auth-form .form-check-input {
+  position: absolute;
+  left: 0;
+  top: 4px;
+  width: 16px;
+  height: 16px;
+}
+
+.auth-form .form-check-label {
+  margin-bottom: 0;
+}
+
+/* Alerts */
+.auth-form .alert {
+  position: relative;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+
+.auth-form .alert-danger {
+  color: #721c24;
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+}
+
+.auth-form .alert-success {
+  color: #155724;
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+}
+
+.auth-form .text-danger {
+  color: #dc3545;
+}
+
+/* Utility classes */
+.auth-form .d-grid {
+  display: grid;
+}
+
+.auth-form .gap-2 {
+  gap: 8px;
+}
+
+.auth-form .mt-4 {
+  margin-top: 24px;
+}
+
+.auth-form .me-2 {
+  margin-right: 8px;
+}
+
+.auth-form .me-1 {
+  margin-right: 4px;
+}
+
+.auth-form .mt-2 {
+  margin-top: 8px;
+}
+
+/* Additional styling for better visibility */
+.container {
+  position: relative;
+  z-index: 5;
+}
+
+/* Make headings more vibrant */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--primary-dark);
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+/* Add a subtle background pattern */
+body {
+  background-color: #f8f9fa;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%234361ee' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* Bootstrap-like button close */
+.auth-form .btn-close {
+  box-sizing: content-box;
+  width: 16px;
+  height: 16px;
+  padding: 4px;
+  color: #000;
+  background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/%3e%3c/svg%3e") center/16px auto no-repeat;
+  border: 0;
+  border-radius: 4px;
+  opacity: .5;
+  cursor: pointer;
+}
+
+.auth-form .btn-close:hover {
+  opacity: .75;
+}

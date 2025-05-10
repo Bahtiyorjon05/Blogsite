@@ -1,0 +1,188 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}{{ tag.name }} | PyBlog{% endblock %}
+
+{% block content %}
+<div class="tag-posts-page">
+    <div class="page-header">
+        <div class="tag-header">
+            <div class="tag-icon">
+                <i class="fas fa-tag"></i>
+            </div>
+            <div>
+                <h1 class="page-title">#{{ tag.name }}</h1>
+                <div class="tag-meta">
+                    <span class="tag-count">{{ tag.post_count }} posts</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="posts-container">
+        {% if posts %}
+            <div class="posts-grid">
+                {% for post in posts %}
+                    <div class="post-card">
+                        <div class="post-image">
+                            {% if post.featured_image %}
+                                <img src="{{ post.featured_image.url }}" alt="{{ post.title }}">
+                            {% else %}
+                                <div class="placeholder-image">
+                                    <i class="fas fa-code"></i>
+                                </div>
+                            {% endif %}
+                            {% if post.category %}
+                                <a href="{% url 'category_posts' post.category.slug %}" class="category-badge">{{ post.category.name }}</a>
+                            {% endif %}
+                        </div>
+                        <div class="post-content">
+                            <h2 class="post-title">
+                                <a href="{% url 'post_detail' post.slug %}">{{ post.title }}</a>
+                            </h2>
+                            <div class="post-meta">
+                                <span><i class="far fa-user"></i> {{ post.author.username }}</span>
+                                <span><i class="far fa-calendar"></i> {{ post.date_created|date:"M d, Y" }}</span>
+                                <span><i class="far fa-eye"></i> {{ post.views }} views</span>
+                            </div>
+                            <p class="post-excerpt">{{ post.excerpt|default:post.content|truncatewords:25 }}</p>
+                            <div class="post-footer">
+                                <a href="{% url 'post_detail' post.slug %}" class="read-more">Read More <i class="fas fa-arrow-right"></i></a>
+                                <div class="post-stats">
+                                    <span><i class="far fa-heart"></i> {{ post.total_likes }}</span>
+                                    <span><i class="far fa-comment"></i> {{ post.total_comments }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Pagination -->
+            {% if is_paginated %}
+                <div class="pagination">
+                    {% if page_obj.has_previous %}
+                        <a href="?page=1" class="pagination-item first">
+                            <i class="fas fa-angle-double-left"></i>
+                        </a>
+                        <a href="?page={{ page_obj.previous_page_number }}" class="pagination-item prev">
+                            <i class="fas fa-angle-left"></i>
+                        </a>
+                    {% endif %}
+                    
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <span class="pagination-item current">{{ num }}</span>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <a href="?page={{ num }}" class="pagination-item">{{ num }}</a>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}" class="pagination-item next">
+                            <i class="fas fa-angle-right"></i>
+                        </a>
+                        <a href="?page={{ page_obj.paginator.num_pages }}" class="pagination-item last">
+                            <i class="fas fa-angle-double-right"></i>
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="empty-state">
+                <i class="fas fa-file-alt"></i>
+                <p>No posts found with this tag.</p>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'create_post' %}?tag={{ tag.name }}" class="btn btn-sm">Create Post</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <!-- Related Tags Widget -->
+        <div class="widget tags-widget">
+            <h3 class="widget-title">Related Tags</h3>
+            <div class="tags-cloud">
+                {% for related_tag in related_tags %}
+                    <a href="{% url 'tag_posts' related_tag.slug %}" class="tag-item">{{ related_tag.name }}</a>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Popular Posts Widget -->
+        <div class="widget popular-posts-widget">
+            <h3 class="widget-title">Popular with #{{ tag.name }}</h3>
+            {% if popular_posts %}
+                <div class="popular-posts">
+                    {% for popular_post in popular_posts %}
+                        <div class="popular-post-item">
+                            <div class="popular-post-rank">
+                                {{ forloop.counter }}
+                            </div>
+                            <div class="popular-post-content">
+                                <h4 class="popular-post-title">
+                                    <a href="{% url 'post_detail' popular_post.slug %}">{{ popular_post.title }}</a>
+                                </h4>
+                                <div class="post-meta">
+                                    <span><i class="far fa-eye"></i> {{ popular_post.views }} views</span>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state small">
+                    <p>No popular posts with this tag yet.</p>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Authors Widget -->
+        <div class="widget authors-widget">
+            <h3 class="widget-title">Top Authors</h3>
+            {% if top_authors %}
+                <div class="authors-list">
+                    {% for author in top_authors %}
+                        <div class="author-item">
+                            <div class="author-avatar">
+                                {% if author.userprofile.avatar %}
+                                    <img src="{{ author.userprofile.avatar.url }}" alt="{{ author.username }}">
+                                {% else %}
+                                    <div class="avatar-placeholder">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="author-info">
+                                <h4 class="author-name">
+                                    <a href="{% url 'user_profile' author.username %}">{{ author.get_full_name|default:author.username }}</a>
+                                </h4>
+                                <p class="author-posts">{{ author.post_count }} posts</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state small">
+                    <p>No authors found.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add animation to post cards
+        const postCards = document.querySelectorAll('.post-card');
+        postCards.forEach((card, index) => {
+            setTimeout(() => {
+                card.classList.add('animate-fadeIn');
+            }, 100 * index);
+        });
+    });
+</script>
+{% endblock %}

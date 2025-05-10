@@ -1,15 +1,217 @@
 {% extends 'blog/base.html' %}
 
+{% block title %}Blog Posts | PyBlog{% endblock %}
+
 {% block content %}
-    <h2>All Posts 📝</h2>
-    <ul>
-        {% for post in posts %}
-            <li>
-                <a href="{% url 'post_detail' post.id %}">{{ post.title }}</a>
-                ({{ post.date_created }})
-            </li>
-        {% empty %}
-            <li>No posts yet.</li>
-        {% endfor %}
-    </ul>
+<div class="blog-page">
+    <div class="page-header">
+        <div class="page-header-content">
+            <h1 class="page-title">Blog Posts</h1>
+            <p class="page-description">Discover the latest articles and tutorials</p>
+        </div>
+        
+        <div class="filter-controls">
+            <div class="search-container">
+                <form method="get" action="{% url 'post_list' %}" class="search-form-inline">
+                    <input type="text" name="query" placeholder="Search posts..." value="{{ request.GET.query }}" class="search-input">
+                    <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
+                </form>
+            </div>
+            
+            <div class="sort-container">
+                <form method="get" action="{% url 'post_list' %}" class="sort-form">
+                    {% if request.GET.query %}
+                        <input type="hidden" name="query" value="{{ request.GET.query }}">
+                    {% endif %}
+                    <select name="sort" class="sort-select" onchange="this.form.submit()">
+                        <option value="newest" {% if current_sort == 'newest' %}selected{% endif %}>Newest First</option>
+                        <option value="oldest" {% if current_sort == 'oldest' %}selected{% endif %}>Oldest First</option>
+                        <option value="popular" {% if current_sort == 'popular' %}selected{% endif %}>Most Popular</option>
+                        <option value="comments" {% if current_sort == 'comments' %}selected{% endif %}>Most Comments</option>
+                    </select>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="content-with-sidebar">
+        <!-- Main Content -->
+        <div class="main-content">
+            {% if posts %}
+                {% if request.GET.query %}
+                    <div class="search-results-header">
+                        <h2>Search results for "{{ request.GET.query }}"</h2>
+                        <p>{{ posts.count }} result{{ posts.count|pluralize }} found</p>
+                    </div>
+                {% endif %}
+                
+                <div class="posts-grid">
+                    {% for post in posts %}
+                        <div class="post-card">
+                            <div class="post-image">
+                                {% if post.featured_image %}
+                                    <img src="{{ post.featured_image.url }}" alt="{{ post.title }}">
+                                {% else %}
+                                    <div class="placeholder-image">
+                                        <i class="fas fa-code"></i>
+                                    </div>
+                                {% endif %}
+                                {% if post.category %}
+                                    <a href="{% url 'category_posts' post.category.slug %}" class="category-badge">{{ post.category.name }}</a>
+                                {% endif %}
+                            </div>
+                            <div class="post-content">
+                                <h2 class="post-title">
+                                    <a href="{% url 'post_detail' post.slug %}">{{ post.title }}</a>
+                                </h2>
+                                <div class="post-meta">
+                                    <span><i class="far fa-user"></i> {{ post.author.username }}</span>
+                                    <span><i class="far fa-calendar"></i> {{ post.date_created|date:"M d, Y" }}</span>
+                                    <span><i class="far fa-eye"></i> {{ post.views }} views</span>
+                                </div>
+                                <p class="post-excerpt">{{ post.excerpt|default:post.content|truncatewords:25 }}</p>
+                                <div class="post-footer">
+                                    <a href="{% url 'post_detail' post.slug %}" class="read-more">Read More <i class="fas fa-arrow-right"></i></a>
+                                    <div class="post-stats">
+                                        <span><i class="far fa-heart"></i> {{ post.total_likes }}</span>
+                                        <span><i class="far fa-comment"></i> {{ post.total_comments }}</span>
+                                    </div>
+                                </div>
+                                {% if post.tags.all %}
+                                    <div class="post-tags">
+                                        {% for tag in post.tags.all|slice:":3" %}
+                                            <a href="{% url 'tag_posts' tag.slug %}" class="tag-item small">{{ tag.name }}</a>
+                                        {% endfor %}
+                                        {% if post.tags.all.count > 3 %}
+                                            <span class="more-tags">+{{ post.tags.all.count|add:"-3" }}</span>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Pagination -->
+                {% if is_paginated %}
+                    <div class="pagination">
+                        {% if page_obj.has_previous %}
+                            <a href="?{% if request.GET.query %}query={{ request.GET.query }}&{% endif %}{% if request.GET.sort %}sort={{ request.GET.sort }}&{% endif %}page=1" class="pagination-item first">
+                                <i class="fas fa-angle-double-left"></i>
+                            </a>
+                            <a href="?{% if request.GET.query %}query={{ request.GET.query }}&{% endif %}{% if request.GET.sort %}sort={{ request.GET.sort }}&{% endif %}page={{ page_obj.previous_page_number }}" class="pagination-item prev">
+                                <i class="fas fa-angle-left"></i>
+                            </a>
+                        {% endif %}
+                        
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <span class="pagination-item current">{{ num }}</span>
+                            {% elif num > page_obj.number|add:"-3" and num < page_obj.number|add:"3" %}
+                                <a href="?{% if request.GET.query %}query={{ request.GET.query }}&{% endif %}{% if request.GET.sort %}sort={{ request.GET.sort }}&{% endif %}page={{ num }}" class="pagination-item">{{ num }}</a>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if page_obj.has_next %}
+                            <a href="?{% if request.GET.query %}query={{ request.GET.query }}&{% endif %}{% if request.GET.sort %}sort={{ request.GET.sort }}&{% endif %}page={{ page_obj.next_page_number }}" class="pagination-item next">
+                                <i class="fas fa-angle-right"></i>
+                            </a>
+                            <a href="?{% if request.GET.query %}query={{ request.GET.query }}&{% endif %}{% if request.GET.sort %}sort={{ request.GET.sort }}&{% endif %}page={{ page_obj.paginator.num_pages }}" class="pagination-item last">
+                                <i class="fas fa-angle-double-right"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="empty-state">
+                    {% if request.GET.query %}
+                        <i class="fas fa-search"></i>
+                        <p>No posts found matching "{{ request.GET.query }}".</p>
+                        <a href="{% url 'post_list' %}" class="btn btn-sm">Clear Search</a>
+                    {% else %}
+                        <i class="fas fa-file-alt"></i>
+                        <p>No posts yet. Be the first to create one!</p>
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'create_post' %}" class="btn btn-sm">Create Post</a>
+                        {% else %}
+                            <a href="{% url 'login' %}?next={% url 'create_post' %}" class="btn btn-sm">Login to Create Post</a>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <!-- Categories Widget -->
+            <div class="widget categories-widget">
+                <h3 class="widget-title">Categories</h3>
+                <ul class="categories-list">
+                    {% for category in categories %}
+                        <li>
+                            <a href="{% url 'category_posts' category.slug %}">
+                                <span class="category-name">{{ category.name }}</span>
+                                <span class="category-count">{{ category.post_count }}</span>
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <a href="{% url 'category_list' %}" class="widget-link">View All Categories</a>
+            </div>
+            
+            <!-- Tags Widget -->
+            <div class="widget tags-widget">
+                <h3 class="widget-title">Popular Tags</h3>
+                <div class="tags-cloud">
+                    {% for tag in popular_tags %}
+                        <a href="{% url 'tag_posts' tag.slug %}" class="tag-item">{{ tag.name }}</a>
+                    {% endfor %}
+                </div>
+                <a href="{% url 'tag_list' %}" class="widget-link">View All Tags</a>
+            </div>
+            
+            <!-- Popular Posts Widget -->
+            <div class="widget popular-posts-widget">
+                <h3 class="widget-title">Popular Posts</h3>
+                {% if popular_posts %}
+                    <div class="popular-posts">
+                        {% for popular_post in popular_posts %}
+                            <div class="popular-post-item">
+                                <div class="popular-post-rank">
+                                    {{ forloop.counter }}
+                                </div>
+                                <div class="popular-post-content">
+                                    <h4 class="popular-post-title">
+                                        <a href="{% url 'post_detail' popular_post.slug %}">{{ popular_post.title }}</a>
+                                    </h4>
+                                    <div class="post-meta">
+                                        <span><i class="far fa-eye"></i> {{ popular_post.views }} views</span>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state small">
+                        <p>No popular posts yet.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add animation to post cards
+        const postCards = document.querySelectorAll('.post-card');
+        postCards.forEach((card, index) => {
+            setTimeout(() => {
+                card.classList.add('animate-fadeIn');
+            }, 100 * index);
+        });
+    });
+</script>
 {% endblock %}

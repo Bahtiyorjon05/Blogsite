@@ -1,0 +1,107 @@
+{% extends 'blog/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'auth.css' %}">
+{% endblock %}
+
+{% block title %}Login | PyBlog{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card auth-card shadow-lg border-0">
+                <div class="card-body p-5">
+                    <h2 class="text-center mb-4 text-primary">Login</h2>
+                    <p class="text-center text-muted mb-4">Welcome back! Please login to your account.</p>
+                    
+                    <form method="post" class="auth-form" novalidate>
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.non_field_errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        
+                        <div class="mb-4">
+                            <label for="{{ form.username.id_for_label }}" class="form-label">
+                                <i class="fas fa-user me-2"></i>Username
+                            </label>
+                            {{ form.username }}
+                            {% if form.username.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.username.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="{{ form.password.id_for_label }}" class="form-label">
+                                <i class="fas fa-lock me-2"></i>Password
+                            </label>
+                            {{ form.password }}
+                            {% if form.password.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.password.errors %}
+                                    {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-4 form-check">
+                            <input type="checkbox" class="form-check-input" id="remember-me" name="remember-me">
+                            <label class="form-check-label" for="remember-me">Remember me</label>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-sign-in-alt me-2"></i>Login
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <div class="text-center mt-4">
+                        <p>Don't have an account? <a href="{% url 'register' %}" class="text-primary">Register</a></p>
+                        <p><a href="#" class="text-muted">Forgot your password?</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-5 mt-4 mt-md-0">
+            <div class="card bg-primary text-white shadow-lg border-0">
+                <div class="card-body p-5">
+                    <h3 class="mb-4">Join Our Community</h3>
+                    <p>Share your Python knowledge, connect with fellow developers, and learn from the best in the community.</p>
+                    
+                    <div class="mt-4">
+                        <div class="d-flex align-items-center mb-3 bg-white bg-opacity-10 p-3 rounded">
+                            <i class="fas fa-code me-3 fa-lg"></i>
+                            <span>Share code with syntax highlighting</span>
+                        </div>
+                        <div class="d-flex align-items-center mb-3 bg-white bg-opacity-10 p-3 rounded">
+                            <i class="fas fa-comment me-3 fa-lg"></i>
+                            <span>Engage in discussions</span>
+                        </div>
+                        <div class="d-flex align-items-center mb-3 bg-white bg-opacity-10 p-3 rounded">
+                            <i class="fas fa-heart me-3 fa-lg"></i>
+                            <span>Like and save favorite posts</span>
+                        </div>
+                        <div class="d-flex align-items-center mb-3 bg-white bg-opacity-10 p-3 rounded">
+                            <i class="fas fa-user-friends me-3 fa-lg"></i>
+                            <span>Build your developer network</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

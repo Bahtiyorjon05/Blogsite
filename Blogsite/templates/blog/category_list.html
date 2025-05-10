@@ -1,0 +1,60 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}Categories | PyBlog{% endblock %}
+
+{% block content %}
+<div class="categories-page">
+    <div class="page-header">
+        <h1 class="page-title">Categories</h1>
+        <p class="page-description">Browse posts by category</p>
+    </div>
+    
+    <div class="categories-container">
+        {% if categories %}
+            <div class="categories-grid">
+                {% for category in categories %}
+                    <div class="category-card">
+                        <div class="category-icon">
+                            <i class="{% if category.icon %}{{ category.icon }}{% else %}fas fa-folder{% endif %}"></i>
+                        </div>
+                        <div class="category-content">
+                            <h2 class="category-title">
+                                <a href="{% url 'category_posts' category.slug %}">{{ category.name }}</a>
+                            </h2>
+                            <p class="category-count">{{ category.post_count }} posts</p>
+                            {% if category.description %}
+                                <p class="category-description">{{ category.description|truncatechars:100 }}</p>
+                            {% endif %}
+                        </div>
+                        <a href="{% url 'category_posts' category.slug %}" class="category-link">
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <i class="fas fa-folder-open"></i>
+                <p>No categories found.</p>
+                {% if user.is_staff %}
+                    <a href="{% url 'admin:blog_category_add' %}" class="btn btn-sm">Create Category</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add animation to category cards
+        const categoryCards = document.querySelectorAll('.category-card');
+        categoryCards.forEach((card, index) => {
+            setTimeout(() => {
+                card.classList.add('animate-fadeIn');
+            }, 100 * index);
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,551 @@
+/* Import the original CSS file */
+@import url('style.css');
+
+/* Additional CSS to ensure styles are applied */
+:root {
+    --primary-color: #4a6cf7;
+    --primary-light: #6e8eff;
+    --primary-dark: #3451b2;
+    --secondary-color: #2c3e50;
+    --accent-color: #f72585;
+    --accent-light: #ff5bac;
+    --accent-dark: #b80058;
+    --light-color: #f8f9fa;
+    --dark-color: #212529;
+    --success-color: #00b894;
+    --warning-color: #fdcb6e;
+    --danger-color: #e74c3c;
+    --info-color: #0abde3;
+    --border-radius: 10px;
+    --box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --box-shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    --gradient-primary: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+    --gradient-accent: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-light) 100%);
+    --gradient-dark: linear-gradient(135deg, var(--dark-color) 0%, var(--secondary-color) 100%);
+}
+
+/* Header Styles */
+header {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
+    color: white;
+    padding: 1rem 0;
+    z-index: 1000;
+}
+
+.header-bg-shape {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 40%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    clip-path: polygon(100% 0, 0% 0, 100% 100%);
+    z-index: -1;
+}
+
+/* Form Error Styling - Completely Revised */
+.form-error,
+.errorlist,
+.invalid-feedback {
+    color: var(--danger-color);
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(231, 76, 60, 0.1);
+    border-left: 3px solid var(--danger-color);
+    padding: 0.5rem 0.8rem;
+    border-radius: 0 4px 4px 0;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    position: relative;
+    clear: both;
+    z-index: 1;
+    width: 100%;
+    box-sizing: border-box;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Form styling and controls - COMPLETELY REVISED */
+.form-group {
+    position: relative;
+    margin-bottom: 1.5rem;
+    width: 100%;
+    clear: both;
+    transition: all 0.3s ease;
+    z-index: 1;
+}
+
+/* Remove hover effects that might cause issues */
+.form-group:hover {
+    z-index: 5;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--secondary-color);
+    transition: color 0.3s ease;
+    position: relative;
+    z-index: 2;
+}
+
+/* COMPLETELY REVISED FORM CONTROLS */
+.form-control,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+input[type="url"],
+input[type="tel"],
+input[type="number"],
+textarea,
+select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border: 2px solid #ced4da;
+    border-radius: 0.25rem;
+    transition: all 0.3s ease;
+    background-color: #fff;
+    color: var(--dark-color);
+    position: relative;
+    z-index: 3;
+    display: block;
+    margin-bottom: 0.5rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+/* Simple hover effects that won't cause visibility issues */
+.form-control:hover,
+input[type="text"]:hover,
+input[type="email"]:hover,
+input[type="password"]:hover,
+input[type="search"]:hover,
+input[type="url"]:hover,
+input[type="tel"]:hover,
+input[type="number"]:hover,
+textarea:hover,
+select:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #fafafa;
+}
+
+.form-control:focus,
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(74, 108, 247, 0.25);
+    outline: none;
+}
+
+/* Fix for Django form widgets */
+input, textarea, select {
+    display: block;
+}
+
+/* Fix for form help text */
+.help-text, .helptext {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.error-close-btn {
+    background: none;
+    border: none;
+    color: var(--danger-color);
+    cursor: pointer;
+    font-size: 0.8rem;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+    padding: 0;
+    margin-left: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.error-close-btn:hover {
+    opacity: 1;
+}
+
+/* Auth Container and Card Styling - COMPLETELY REVISED */
+.auth-container {
+    display: block;
+    max-width: 800px;
+    margin: 2rem auto;
+    position: relative;
+    z-index: 10;
+}
+
+.auth-card {
+    width: 100%;
+    border: none;
+    border-radius: var(--border-radius);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+    background-color: white;
+    padding: 2rem;
+    position: relative;
+    z-index: 20;
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.auth-title {
+    color: var(--primary-color);
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.auth-subtitle {
+    color: var(--secondary-color);
+    font-size: 1rem;
+    opacity: 0.8;
+}
+
+.auth-form {
+    margin: 0 auto;
+    max-width: 100%;
+}
+
+.auth-form .form-label {
+    font-weight: 600;
+    color: var(--secondary-color);
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.auth-form .form-label i {
+    margin-right: 0.5rem;
+    color: var(--primary-color);
+}
+
+.auth-footer {
+    text-align: center;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(0,0,0,0.1);
+}
+
+.auth-footer p {
+    margin-bottom: 0.5rem;
+}
+
+/* Revised auth info section */
+.auth-info {
+    width: 100%;
+    display: block;
+    margin-top: 2rem;
+}
+
+.auth-info-content {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    color: white;
+    padding: 2.5rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+}
+
+.auth-info-content h2 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
+
+.auth-features {
+    margin-top: 2rem;
+}
+
+.auth-feature {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    background: rgba(255,255,255,0.1);
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+}
+
+.auth-feature i {
+    font-size: 1.2rem;
+    margin-right: 1rem;
+}
+
+.card-body {
+    padding: 2.5rem;
+}
+
+/* Form Checkbox Styling */
+.form-checkbox {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    transition: all 0.3s ease;
+}
+
+.form-checkbox:hover {
+    transform: translateY(-1px);
+}
+
+.form-checkbox .form-check-input {
+    margin-right: 0.5rem;
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+    position: relative;
+    top: 2px;
+}
+
+.form-checkbox .form-check-label {
+    cursor: pointer;
+}
+
+/* Enhanced form element visibility - REVISED */
+.auth-form input,
+.auth-form textarea,
+.auth-form select,
+.auth-form .btn {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border: 2px solid rgba(0, 0, 0, 0.15);
+    background-color: white;
+    position: relative;
+    z-index: 10;
+}
+
+/* Improve form label visibility */
+.form-label {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    display: block;
+    transition: all 0.3s ease;
+    color: var(--secondary-color);
+}
+
+/* Add focus-within state for form groups */
+.form-group:focus-within label {
+    color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+/* COMPLETELY REVISED z-index handling */
+.form-group,
+.form-control,
+input,
+textarea,
+select,
+.btn {
+    position: relative;
+}
+
+/* Remove problematic hover effects */
+.form-group:hover .form-control,
+.form-group:hover input,
+.form-group:hover textarea,
+.form-group:hover select {
+    /* Simple effect that won't cause visibility issues */
+    border-color: var(--primary-color);
+}
+
+/* Additional fixes for form visibility */
+.auth-form {
+    position: relative;
+    z-index: 30;
+}
+
+/* Ensure form elements don't disappear */
+.auth-container,
+.auth-card,
+.auth-form,
+.form-group,
+input,
+textarea,
+select,
+.btn {
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+}
+
+/* Fix for form layout */
+.auth-form .form-group {
+    margin-bottom: 1.5rem;
+    display: block;
+    width: 100%;
+}
+
+/* Button Styling */
+.btn {
+    display: inline-block;
+    font-weight: 600;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    user-select: none;
+    border: 1px solid transparent;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    border-radius: 0.25rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background: var(--gradient-primary);
+    border: none;
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 4px 6px rgba(74, 108, 247, 0.2);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 14px rgba(74, 108, 247, 0.3);
+    background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-color) 100%);
+    color: white;
+}
+
+.btn-secondary {
+    background: var(--secondary-color);
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #3d5366;
+}
+
+.btn-lg {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+}
+
+.btn-block {
+    display: block;
+    width: 100%;
+}
+
+.btn i {
+    margin-right: 0.5rem;
+}
+
+/* Form Actions */
+.form-actions {
+    margin-top: 2rem;
+}
+
+/* Fix for button focus */
+.btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(74, 108, 247, 0.25);
+}
+
+/* Form Error Global Message */
+.form-error-global {
+    background-color: rgba(231, 76, 60, 0.1);
+    border-left: 3px solid var(--danger-color);
+    color: var(--danger-color);
+    padding: 1rem;
+    border-radius: 0 4px 4px 0;
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Fix for terms checkbox */
+.form-checkbox .form-check-input {
+    width: 18px;
+    height: 18px;
+    margin-right: 8px;
+}
+
+.form-checkbox .form-check-label {
+    font-size: 0.9rem;
+    color: var(--secondary-color);
+}
+
+/* Fix for form validation */
+input:focus:invalid {
+    border-color: var(--danger-color);
+    box-shadow: 0 0 0 0.2rem rgba(231, 76, 60, 0.25);
+}
+
+input:focus:valid {
+    border-color: var(--success-color);
+    box-shadow: 0 0 0 0.2rem rgba(0, 184, 148, 0.25);
+}
+
+/* Page Title Styling */
+.page-title {
+    color: var(--primary-color);
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+/* Alerts */
+.alert {
+    border: none;
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.alert i {
+    margin-right: 0.5rem;
+}
+
+.alert-success {
+    background-color: rgba(0, 184, 148, 0.1);
+    color: var(--success-color);
+    border-left: 3px solid var(--success-color);
+}
+
+.alert-error {
+    background-color: rgba(231, 76, 60, 0.1);
+    color: var(--danger-color);
+    border-left: 3px solid var(--danger-color);
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+    padding: 0;
+    margin-left: 0.5rem;
+}
+
+.close-btn:hover {
+    opacity: 1;
+}

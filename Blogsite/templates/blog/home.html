@@ -1,6 +1,220 @@
 {% extends 'blog/base.html' %}
 
+{% block title %}Welcome to PyBlog | Home{% endblock %}
+
 {% block content %}
-    <h2>Welcome to PyBlog!</h2>
-    <p><a href="{% url 'post_list' %}">View All Posts</a></p>
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <h1 class="hero-title">Welcome to PyBlog</h1>
+            <p class="hero-subtitle">A beautiful place to share your Python journey and programming adventures</p>
+            <div class="hero-buttons">
+                <a href="{% url 'post_list' %}" class="btn btn-lg"><i class="fas fa-book-open"></i> Browse Articles</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'create_post' %}" class="btn btn-success btn-lg"><i class="fas fa-pen"></i> Write a Post</a>
+                {% else %}
+                    <a href="{% url 'register' %}" class="btn btn-outline btn-lg"><i class="fas fa-user-plus"></i> Join Community</a>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Posts Section -->
+    <section class="section">
+        <div class="section-header">
+            <h2 class="section-title">Featured Posts</h2>
+            <a href="{% url 'post_list' %}" class="section-link">View All <i class="fas fa-arrow-right"></i></a>
+        </div>
+        
+        <div class="featured-posts">
+            {% if featured_posts %}
+                {% for post in featured_posts %}
+                    <div class="featured-post-card">
+                        <div class="featured-post-image">
+                            {% if post.featured_image %}
+                                <img src="{{ post.featured_image.url }}" alt="{{ post.title }}">
+                            {% else %}
+                                <div class="placeholder-image">
+                                    <i class="fas fa-code"></i>
+                                </div>
+                            {% endif %}
+                            {% if post.category %}
+                                <a href="{% url 'category_posts' post.category.slug %}" class="category-badge">{{ post.category.name }}</a>
+                            {% endif %}
+                        </div>
+                        <div class="featured-post-content">
+                            <h3 class="featured-post-title">
+                                <a href="{% url 'post_detail' post.slug %}">{{ post.title }}</a>
+                            </h3>
+                            <div class="post-meta">
+                                <span><i class="far fa-user"></i> {{ post.author.username }}</span>
+                                <span><i class="far fa-calendar"></i> {{ post.date_created|date:"M d, Y" }}</span>
+                                <span><i class="far fa-eye"></i> {{ post.views }} views</span>
+                            </div>
+                            <p class="featured-post-excerpt">{{ post.excerpt|default:post.content|truncatewords:25 }}</p>
+                            <div class="featured-post-footer">
+                                <a href="{% url 'post_detail' post.slug %}" class="read-more">Read More <i class="fas fa-arrow-right"></i></a>
+                                <div class="post-stats">
+                                    <span><i class="far fa-heart"></i> {{ post.total_likes }}</span>
+                                    <span><i class="far fa-comment"></i> {{ post.total_comments }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-newspaper"></i>
+                    <p>No featured posts yet. Check back soon!</p>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- Two Column Section -->
+    <div class="two-column-section">
+        <!-- Recent Posts Column -->
+        <section class="section recent-posts-section">
+            <div class="section-header">
+                <h2 class="section-title">Recent Posts</h2>
+            </div>
+            
+            <div class="recent-posts-list">
+                {% if recent_posts %}
+                    {% for post in recent_posts %}
+                        <div class="recent-post-item">
+                            <div class="recent-post-meta">
+                                <span class="recent-post-date">{{ post.date_created|date:"M d" }}</span>
+                            </div>
+                            <div class="recent-post-content">
+                                <h3 class="recent-post-title">
+                                    <a href="{% url 'post_detail' post.slug %}">{{ post.title }}</a>
+                                </h3>
+                                <div class="post-meta">
+                                    <span><i class="far fa-user"></i> {{ post.author.username }}</span>
+                                    {% if post.category %}
+                                        <span><i class="far fa-folder"></i> {{ post.category.name }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <p>No posts yet. Be the first to create one!</p>
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+        
+        <!-- Categories & Tags Column -->
+        <section class="section sidebar-section">
+            <!-- Categories Widget -->
+            <div class="widget categories-widget">
+                <h3 class="widget-title">Categories</h3>
+                <ul class="categories-list">
+                    {% if categories %}
+                        {% for category in categories %}
+                            <li>
+                                <a href="{% url 'category_posts' category.slug %}">
+                                    <span class="category-name">{{ category.name }}</span>
+                                    <span class="category-count">{{ category.post_count }}</span>
+                                </a>
+                            </li>
+                        {% endfor %}
+                    {% else %}
+                        <li class="empty-item">No categories yet</li>
+                    {% endif %}
+                </ul>
+                <a href="{% url 'category_list' %}" class="widget-link">View All Categories</a>
+            </div>
+            
+            <!-- Tags Widget -->
+            <div class="widget tags-widget">
+                <h3 class="widget-title">Popular Tags</h3>
+                <div class="tags-cloud">
+                    {% if popular_tags %}
+                        {% for tag in popular_tags %}
+                            <a href="{% url 'tag_posts' tag.slug %}" class="tag-item">{{ tag.name }}</a>
+                        {% endfor %}
+                    {% else %}
+                        <p class="empty-item">No tags yet</p>
+                    {% endif %}
+                </div>
+                <a href="{% url 'tag_list' %}" class="widget-link">View All Tags</a>
+            </div>
+        </section>
+    </div>
+    
+    <!-- Features Section -->
+    <section class="section features-section">
+        <h2 class="section-title text-center">Why Choose PyBlog?</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-code"></i>
+                </div>
+                <h3 class="feature-title">Share Your Code</h3>
+                <p class="feature-description">Share your Python projects, tips, and tricks with the community using our rich code editor with syntax highlighting.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-lightbulb"></i>
+                </div>
+                <h3 class="feature-title">Learn Together</h3>
+                <p class="feature-description">Discover new programming techniques and best practices from fellow developers through comments and discussions.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3 class="feature-title">Join Community</h3>
+                <p class="feature-description">Connect with like-minded Python enthusiasts, follow your favorite authors, and build your network.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <h3 class="feature-title">Responsive Design</h3>
+                <p class="feature-description">Enjoy a seamless experience on any device with our beautiful, responsive design that adapts to your screen.</p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Call to Action Section -->
+    <section class="cta-section">
+        <div class="cta-content">
+            <h2 class="cta-title">Ready to start your Python journey?</h2>
+            <p class="cta-description">Join our community today and share your knowledge with fellow Python enthusiasts!</p>
+            <div class="cta-buttons">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'create_post' %}" class="btn btn-lg"><i class="fas fa-pen"></i> Write Your First Post</a>
+                {% else %}
+                    <a href="{% url 'register' %}" class="btn btn-lg"><i class="fas fa-user-plus"></i> Create Account</a>
+                    <a href="{% url 'login' %}" class="btn btn-outline btn-lg"><i class="fas fa-sign-in-alt"></i> Login</a>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add animation to hero section
+        const heroContent = document.querySelector('.hero-content');
+        heroContent.classList.add('animate-fadeIn');
+        
+        // Add animation to featured posts as they come into view
+        const featuredPosts = document.querySelectorAll('.featured-post-card');
+        featuredPosts.forEach((post, index) => {
+            setTimeout(() => {
+                post.classList.add('animate-fadeIn');
+            }, 200 * index);
+        });
+    });
+</script>
 {% endblock %}

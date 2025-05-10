@@ -1,0 +1,230 @@
+{% extends 'blog/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'auth.css' %}">
+{% endblock %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h1 class="text-center text-primary mb-4">Create Account</h1>
+            <p class="lead text-center mb-4">Join the PyBlog community today!</p>
+            
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %} alert-dismissible fade show">
+                        <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% else %}fa-info-circle{% endif %} me-2"></i>
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            <div class="card auth-card shadow border-0">
+                <div class="card-body p-5">
+                    <form method="post" id="registerForm" class="auth-form" novalidate>
+                        {% csrf_token %}
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger mb-4">
+                                <i class="fas fa-exclamation-circle me-2"></i> {{ form.non_field_errors|striptags }}
+                            </div>
+                        {% endif %}
+                        
+                        <div class="mb-4">
+                            <label for="id_username" class="form-label"><i class="fas fa-user-circle me-2"></i> Username</label>
+                            {{ form.username }}
+                            {% if form.username.errors %}
+                                <div class="text-danger mt-2">
+                                    <i class="fas fa-exclamation-triangle me-1"></i> {{ form.username.errors|striptags }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="id_email" class="form-label"><i class="fas fa-envelope me-2"></i> Email</label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                                <div class="text-danger mt-2">
+                                    <i class="fas fa-exclamation-triangle me-1"></i> {{ form.email.errors|striptags }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="id_password1" class="form-label"><i class="fas fa-lock me-2"></i> Password</label>
+                            {{ form.password1 }}
+                            {% if form.password1.errors %}
+                                <div class="text-danger mt-2">
+                                    <i class="fas fa-exclamation-triangle me-1"></i> {{ form.password1.errors|striptags }}
+                                </div>
+                            {% endif %}
+                            <small class="form-text text-muted mt-2">Your password must be at least 8 characters long and contain letters and numbers.</small>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="id_password2" class="form-label"><i class="fas fa-lock me-2"></i> Confirm Password</label>
+                            {{ form.password2 }}
+                            {% if form.password2.errors %}
+                                <div class="text-danger mt-2">
+                                    <i class="fas fa-exclamation-triangle me-1"></i> {{ form.password2.errors|striptags }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-4 form-check">
+                            <input type="checkbox" id="terms" name="terms" class="form-check-input" {% if terms_error %}aria-invalid="true"{% endif %}>
+                            <label for="terms" class="form-check-label">I agree to the <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">Terms of Service</a> and <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal">Privacy Policy</a></label>
+                            {% if terms_error %}
+                                <div class="text-danger mt-2" id="terms-error">
+                                    <i class="fas fa-exclamation-triangle me-1"></i> You must accept the Terms of Service and Privacy Policy to register.
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg"><i class="fas fa-user-plus me-2"></i> Create Account</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="text-center mt-4">
+                <p>Already have an account? <a href="{% url 'login' %}" class="text-primary">Login</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Simple form validation for terms checkbox
+        const registerForm = document.getElementById('registerForm');
+        const termsCheckbox = document.getElementById('terms');
+        const termsError = document.getElementById('terms-error');
+        
+        if (registerForm && termsCheckbox) {
+            registerForm.addEventListener('submit', function(e) {
+                if (!termsCheckbox.checked) {
+                    e.preventDefault();
+                    if (termsError) {
+                        termsError.style.display = 'block';
+                    }
+                }
+            });
+            
+            termsCheckbox.addEventListener('change', function() {
+                if (this.checked && termsError) {
+                    termsError.style.display = 'none';
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add animation to auth card
+        const authCard = document.querySelector('.auth-card');
+        authCard.classList.add('animate-fadeIn');
+        
+        // Focus on username field
+        document.getElementById('{{ form.username.id_for_label }}').focus();
+        
+        // Password strength indicator
+        const password1Field = document.getElementById('{{ form.password1.id_for_label }}');
+        const password2Field = document.getElementById('{{ form.password2.id_for_label }}');
+        
+        if (password1Field) {
+            password1Field.addEventListener('input', function() {
+                const password = this.value;
+                let strength = 0;
+                
+                if (password.length >= 8) strength += 1;
+                if (/[A-Z]/.test(password)) strength += 1;
+                if (/[0-9]/.test(password)) strength += 1;
+                if (/[^A-Za-z0-9]/.test(password)) strength += 1;
+                
+                let strengthClass = '';
+                let strengthText = '';
+                
+                switch (strength) {
+                    case 0:
+                    case 1:
+                        strengthClass = 'weak';
+                        strengthText = 'Weak';
+                        break;
+                    case 2:
+                        strengthClass = 'medium';
+                        strengthText = 'Medium';
+                        break;
+                    case 3:
+                        strengthClass = 'strong';
+                        strengthText = 'Strong';
+                        break;
+                    case 4:
+                        strengthClass = 'very-strong';
+                        strengthText = 'Very Strong';
+                        break;
+                }
+                
+                // Remove any existing strength indicator
+                const existingIndicator = this.parentNode.querySelector('.password-strength');
+                if (existingIndicator) {
+                    existingIndicator.remove();
+                }
+                
+                // Add new strength indicator
+                if (password.length > 0) {
+                    const strengthIndicator = document.createElement('div');
+                    strengthIndicator.className = `password-strength ${strengthClass}`;
+                    strengthIndicator.innerHTML = `
+                        <div class="strength-bar">
+                            <div class="strength-bar-fill" style="width: ${(strength / 4) * 100}%"></div>
+                        </div>
+                        <span>${strengthText}</span>
+                    `;
+                    this.parentNode.appendChild(strengthIndicator);
+                }
+            });
+        }
+        
+        // Password matching check
+        if (password2Field) {
+            password2Field.addEventListener('input', function() {
+                const password1 = password1Field.value;
+                const password2 = this.value;
+                
+                // Remove any existing match indicator
+                const existingIndicator = this.parentNode.querySelector('.password-match');
+                if (existingIndicator) {
+                    existingIndicator.remove();
+                }
+                
+                // Add match indicator if second password field has content
+                if (password2.length > 0) {
+                    const matchIndicator = document.createElement('div');
+                    matchIndicator.className = 'password-match';
+                    
+                    if (password1 === password2) {
+                        matchIndicator.classList.add('match');
+                        matchIndicator.innerHTML = '<i class="fas fa-check-circle"></i> Passwords match';
+                    } else {
+                        matchIndicator.classList.add('no-match');
+                        matchIndicator.innerHTML = '<i class="fas fa-times-circle"></i> Passwords do not match';
+                    }
+                    
+                    this.parentNode.appendChild(matchIndicator);
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

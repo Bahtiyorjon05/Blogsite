@@ -1,15 +1,253 @@
 {% load static %}
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>PyBlog 🐍</title>
-    <link rel="stylesheet" href="{% static 'style.css' %}">
-
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}PyBlog 🐍{% endblock %}</title>
+    <meta name="description" content="A beautiful place to share your Python journey and programming adventures.">
+    <link rel="icon" href="{% static 'favicon.svg' %}" type="image/svg+xml">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Code Syntax Highlighting -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'modern-theme.css' %}?v={% now 'U' %}">
+    <link rel="stylesheet" href="{% static 'dark-mode-fix.css' %}?v={% now 'U' %}">
+    {% block extra_head %}{% endblock %}
+</head>
 <body>
-    <h1>🔥 PyBlog 🔥</h1>
-    <hr>
-    {% block content %}{% endblock %}
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <!-- Logo -->
+            <a href="{% url 'home' %}" class="navbar-brand">
+                <img src="{% static 'logo.svg' %}" alt="PyBlog Logo" width="40" height="40">
+                <span>PyBlog</span>
+            </a>
+            
+            <!-- Dark Mode Toggle -->
+            <div class="form-check form-switch ms-auto me-3 d-none d-lg-block">
+                <input class="form-check-input" type="checkbox" id="dark-mode-toggle">
+                <label class="form-check-label" for="dark-mode-toggle">
+                    <i class="fas fa-moon"></i>
+                </label>
+            </div>
+            
+            <!-- Mobile Menu Toggle -->
+            <button class="navbar-toggler" type="button" id="mobile-menu-toggle" aria-expanded="false" aria-label="Toggle navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <!-- Navigation Links -->
+            <div class="collapse navbar-collapse" id="mobile-menu">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{% url 'home' %}">
+                            <i class="fas fa-home"></i> Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if 'posts/' in request.path and not 'new' in request.path %}active{% endif %}" href="{% url 'post_list' %}">
+                            <i class="fas fa-blog"></i> Blog
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if 'categories' in request.path %}active{% endif %}" href="{% url 'category_list' %}">
+                            <i class="fas fa-folder"></i> Categories
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if 'tags' in request.path %}active{% endif %}" href="{% url 'tag_list' %}">
+                            <i class="fas fa-tags"></i> Tags
+                        </a>
+                    </li>
+                </ul>
+                
+                <!-- Search Form -->
+                <form class="d-flex mb-3 mb-lg-0 me-lg-3" action="{% url 'post_list' %}" method="get">
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="query" placeholder="Search articles..." aria-label="Search">
+                        <button class="btn btn-outline" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+                
+                <!-- Auth Buttons -->
+                <div class="d-flex align-items-center mt-3 mt-lg-0">
+                    {% if user.is_authenticated %}
+                        <div class="dropdown">
+                            <button class="btn dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user-circle me-1"></i> {{ user.username }}
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'profile' %}">
+                                        <i class="fas fa-user me-2"></i> Profile
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'dashboard' %}">
+                                        <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'create_post' %}">
+                                        <i class="fas fa-pen me-2"></i> New Post
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'logout' %}">
+                                        <i class="fas fa-sign-out-alt me-2"></i> Logout
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="btn btn-outline me-2">
+                            <i class="fas fa-sign-in-alt me-1"></i> Login
+                        </a>
+                        <a href="{% url 'register' %}" class="btn">
+                            <i class="fas fa-user-plus me-1"></i> Register
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Messages/Alerts -->
+    {% if messages %}
+        <div class="container mt-3">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' or message.tags == 'danger' %}fa-exclamation-circle{% else %}fa-info-circle{% endif %} me-2"></i>
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="container py-4">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-5 pt-5">
+        <div class="container">
+            <div class="row g-4">
+                <!-- About -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="footer-about">
+                        <h5 class="mb-3">About PyBlog</h5>
+                        <p class="mb-3">A beautiful place to share your Python journey and programming adventures with the world.</p>
+                        <div class="d-flex align-items-center mb-3">
+                            <img src="{% static 'logo.svg' %}" alt="PyBlog Logo" width="30" height="30" class="me-2">
+                            <span class="fw-bold">PyBlog</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Quick Links -->
+                <div class="col-lg-2 col-md-6">
+                    <h5 class="mb-3">Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="{% url 'home' %}"><i class="fas fa-chevron-right me-1 small"></i> Home</a></li>
+                        <li class="mb-2"><a href="{% url 'post_list' %}"><i class="fas fa-chevron-right me-1 small"></i> Blog</a></li>
+                        <li class="mb-2"><a href="{% url 'category_list' %}"><i class="fas fa-chevron-right me-1 small"></i> Categories</a></li>
+                        <li class="mb-2"><a href="{% url 'tag_list' %}"><i class="fas fa-chevron-right me-1 small"></i> Tags</a></li>
+                        {% if user.is_authenticated %}
+                            <li class="mb-2"><a href="{% url 'dashboard' %}"><i class="fas fa-chevron-right me-1 small"></i> Dashboard</a></li>
+                        {% else %}
+                            <li class="mb-2"><a href="{% url 'login' %}"><i class="fas fa-chevron-right me-1 small"></i> Login</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+                
+                <!-- Connect -->
+                <div class="col-lg-3 col-md-6">
+                    <h5 class="mb-3">Connect With Us</h5>
+                    <div class="d-flex mb-4">
+                        <a href="#" class="me-2 btn btn-sm btn-outline-primary rounded-circle" target="_blank" title="Twitter">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="me-2 btn btn-sm btn-outline-primary rounded-circle" target="_blank" title="GitHub">
+                            <i class="fab fa-github"></i>
+                        </a>
+                        <a href="#" class="me-2 btn btn-sm btn-outline-primary rounded-circle" target="_blank" title="LinkedIn">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                        <a href="#" class="me-2 btn btn-sm btn-outline-primary rounded-circle" target="_blank" title="YouTube">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Newsletter -->
+                <div class="col-lg-3 col-md-6">
+                    <h5 class="mb-3">Newsletter</h5>
+                    <p class="mb-3">Subscribe to our newsletter for the latest updates.</p>
+                    <form class="mb-3">
+                        <div class="input-group">
+                            <input type="email" class="form-control" placeholder="Your email" required>
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Divider -->
+            <hr class="my-4">
+            
+            <!-- Copyright -->
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-md-0">&copy; {% now "Y" %} PyBlog. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <a href="#" class="text-decoration-none me-3">Privacy Policy</a>
+                    <a href="#" class="text-decoration-none me-3">Terms of Service</a>
+                    <a href="#" class="text-decoration-none">Cookie Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Back to Top Button -->
+    <button id="back-to-top" class="btn btn-primary rounded-circle position-fixed bottom-0 end-0 translate-middle d-none">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Chart.js for Dashboard -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Code Syntax Highlighting -->
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-css.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-sql.min.js"></script>
+    
+    <!-- Custom Scripts -->
+    <script src="{% static 'modern-scripts.js' %}?v={% now 'U' %}"></script>
+    {% block extra_js %}{% endblock %}
+    {% block extra_scripts %}{% endblock %}
 </body>
 </html>

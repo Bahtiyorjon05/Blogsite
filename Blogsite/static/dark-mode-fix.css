@@ -1,0 +1,168 @@
+/* Dark Mode Form Fixes */
+body.dark-mode {
+    --light-color: #121212;
+    --dark-color: #f8f9fa;
+    --form-bg: #2d2d2d;
+    --form-border: #444;
+    --form-text: #f8f9fa;
+    --form-placeholder: #aaa;
+    --form-focus-border: #6e8eff;
+    --form-label: #f8f9fa;
+    --form-help: #bbb;
+    --card-bg: #1e1e1e;
+}
+
+/* Fix form elements in dark mode */
+body.dark-mode .form-control,
+body.dark-mode input[type="text"],
+body.dark-mode input[type="email"],
+body.dark-mode input[type="password"],
+body.dark-mode input[type="search"],
+body.dark-mode input[type="url"],
+body.dark-mode input[type="tel"],
+body.dark-mode input[type="number"],
+body.dark-mode textarea,
+body.dark-mode select {
+    background-color: var(--form-bg);
+    color: var(--form-text);
+    border-color: var(--form-border);
+}
+
+/* Fix placeholder text in dark mode */
+body.dark-mode .form-control::placeholder,
+body.dark-mode input::placeholder,
+body.dark-mode textarea::placeholder {
+    color: var(--form-placeholder);
+}
+
+/* Fix form focus states */
+body.dark-mode .form-control:focus,
+body.dark-mode input:focus,
+body.dark-mode textarea:focus,
+body.dark-mode select:focus {
+    border-color: var(--form-focus-border);
+    background-color: #333;
+    color: white;
+    box-shadow: 0 0 0 0.2rem rgba(110, 142, 255, 0.25);
+}
+
+/* Fix form labels */
+body.dark-mode .form-label,
+body.dark-mode label {
+    color: var(--form-label);
+}
+
+/* Fix help text */
+body.dark-mode .form-help,
+body.dark-mode .helptext,
+body.dark-mode .form-text {
+    color: var(--form-help);
+}
+
+/* Fix auth card in dark mode */
+body.dark-mode .auth-card {
+    background-color: var(--card-bg);
+    border-color: var(--form-border);
+}
+
+/* Fix dropdown menu in dark mode */
+body.dark-mode .dropdown-menu {
+    background-color: #2d2d2d;
+    border: 1px solid #444;
+}
+
+body.dark-mode .dropdown-item {
+    color: #f8f9fa;
+}
+
+body.dark-mode .dropdown-item:hover {
+    background-color: #444;
+    color: var(--primary-light);
+}
+
+body.dark-mode .dropdown-divider {
+    border-color: #444;
+}
+
+/* Fix checkboxes in dark mode */
+body.dark-mode .form-check-input {
+    background-color: #333;
+    border-color: #555;
+}
+
+body.dark-mode .form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+body.dark-mode .form-check-label {
+    color: #f8f9fa;
+}
+
+/* Fix alerts in dark mode */
+body.dark-mode .alert {
+    background-color: #2d2d2d;
+    border-color: #444;
+}
+
+body.dark-mode .alert-success {
+    background-color: rgba(0, 184, 148, 0.2);
+    border-left-color: var(--success-color);
+}
+
+body.dark-mode .alert-danger,
+body.dark-mode .alert-error {
+    background-color: rgba(231, 76, 60, 0.2);
+    border-left-color: var(--danger-color);
+}
+
+/* Fix buttons in dark mode */
+body.dark-mode .btn-outline {
+    border-color: var(--primary-light);
+    color: var(--primary-light);
+}
+
+body.dark-mode .btn-outline:hover {
+    background-color: var(--primary-light);
+    color: #121212;
+}
+
+/* Fix error messages */
+body.dark-mode .form-error,
+body.dark-mode .errorlist {
+    background-color: rgba(231, 76, 60, 0.2);
+    color: #ff6b6b;
+}
+
+/* Fix card content in dark mode */
+body.dark-mode .card-content {
+    color: #ddd;
+}
+
+/* Fix mobile menu in dark mode */
+body.dark-mode .nav-container.active {
+    background-color: rgba(18, 18, 18, 0.95);
+}
+
+/* Ensure form visibility */
+.auth-form input,
+.auth-form textarea,
+.auth-form select,
+.auth-form .btn {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Fix for registration form */
+.auth-form {
+    opacity: 1 !important;
+    visibility: visible !important;
+    z-index: 100;
+}
+
+/* Fix for form animations */
+.auth-form .animate-fadeIn {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+    animation: none !important;
+}
