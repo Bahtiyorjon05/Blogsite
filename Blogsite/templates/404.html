@@ -1,0 +1,107 @@
+{% extends 'blog/base.html' %}
+{% load static %}
+
+{% block title %}Page Not Found | PyBlog{% endblock %}
+
+{% block extra_head %}
+    <meta name="description" content="Sorry, the page you're looking for doesn't exist on PyBlog.">
+{% endblock %}
+
+{% block content %}
+<div class="error-page">
+    <div class="error-content">
+        <div class="error-icon">
+            <i class="fas fa-search text-primary" style="font-size: 120px;"></i>
+        </div>
+        <h1 class="error-title">Page Not Found</h1>
+        <h2 class="error-subtitle">404 Error</h2>
+        <p class="error-description">
+            Oops! The page you're looking for doesn't exist. 
+            It might have been moved, deleted, or you entered the wrong URL.
+        </p>
+        
+        <div class="error-actions">
+            <a href="{% url 'home' %}" class="btn btn-primary btn-lg">
+                <i class="fas fa-home me-2"></i>Go Home
+            </a>
+            <a href="{% url 'post_list' %}" class="btn btn-outline-secondary btn-lg">
+                <i class="fas fa-blog me-2"></i>Browse Posts
+            </a>
+        </div>
+        
+        <div class="error-suggestions">
+            <h4>What can you do?</h4>
+            <ul class="list-unstyled">
+                <li><i class="fas fa-check text-success me-2"></i>Check the URL for typos</li>
+                <li><i class="fas fa-check text-success me-2"></i>Use the search bar to find what you're looking for</li>
+                <li><i class="fas fa-check text-success me-2"></i>Browse our latest articles</li>
+                <li><i class="fas fa-check text-success me-2"></i>Go back to the home page</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<style>
+.error-page {
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px 0;
+}
+
+.error-content {
+    max-width: 600px;
+}
+
+.error-icon {
+    margin-bottom: 30px;
+}
+
+.error-title {
+    font-size: 2.5rem;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.error-subtitle {
+    font-size: 1.5rem;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.error-description {
+    font-size: 1.1rem;
+    color: #666;
+    margin-bottom: 40px;
+    line-height: 1.6;
+}
+
+.error-actions {
+    margin-bottom: 50px;
+}
+
+.error-actions .btn {
+    margin: 0 10px 10px 0;
+}
+
+.error-suggestions {
+    text-align: left;
+    background: #f8f9fa;
+    padding: 30px;
+    border-radius: 10px;
+    border: 1px solid #e9ecef;
+}
+
+.error-suggestions h4 {
+    margin-bottom: 20px;
+    color: #495057;
+}
+
+.error-suggestions li {
+    padding: 5px 0;
+    color: #6c757d;
+}
+</style>
+{% endblock %}
