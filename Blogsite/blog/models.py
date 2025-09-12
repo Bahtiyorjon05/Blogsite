@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils.text import slugify
 from django.urls import reverse
+import re
+import math
 
 
 class Category(models.Model):
@@ -84,6 +86,25 @@ class Post(models.Model):
     
     def total_comments(self):
         return self.comments.count()
+    
+    def reading_time(self):
+        """Calculate reading time in minutes based on word count"""
+        # Remove HTML tags from content
+        content_text = re.sub(r'<[^>]*>', '', self.content)
+        # Count words (average reading speed is 200-250 words per minute)
+        word_count = len(content_text.split())
+        # Use 225 words per minute as average reading speed
+        reading_time_minutes = math.ceil(word_count / 225)
+        return max(1, reading_time_minutes)  # Minimum 1 minute
+    
+    class Meta:
+        indexes = [
+            models.Index(fields=['-date_created', 'status']),
+            models.Index(fields=['status', '-views']),
+            models.Index(fields=['category', 'status']),
+            models.Index(fields=['author', 'status']),
+            models.Index(fields=['slug']),
+        ]
 
 
 class Comment(models.Model):

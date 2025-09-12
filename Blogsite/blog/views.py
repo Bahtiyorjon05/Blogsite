@@ -22,8 +22,8 @@ from .serializers import PostSerializer, CategorySerializer, TagSerializer, Comm
 
 # Home Page
 def home(request):
-    featured_posts = Post.objects.filter(status='published').order_by('-views')[:5]
-    recent_posts = Post.objects.filter(status='published').order_by('-date_created')[:5]
+    featured_posts = Post.objects.filter(status='published').select_related('author', 'category').prefetch_related('tags').order_by('-views')[:5]
+    recent_posts = Post.objects.filter(status='published').select_related('author', 'category').order_by('-date_created')[:5]
     categories = Category.objects.annotate(post_count=Count('posts')).order_by('-post_count')[:10]
     popular_tags = Tag.objects.annotate(post_count=Count('posts')).order_by('-post_count')[:15]
     
@@ -44,7 +44,7 @@ class PostListView(ListView):
     paginate_by = 9
     
     def get_queryset(self):
-        queryset = Post.objects.filter(status='published').order_by('-date_created')
+        queryset = Post.objects.filter(status='published').select_related('author', 'category').prefetch_related('tags', 'likes').order_by('-date_created')
         
         # Filter by category if provided
         category_slug = self.kwargs.get('category_slug')
@@ -107,8 +107,8 @@ class PostDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         post = self.object
         
-        # Add comments
-        comments = post.comments.filter(parent=None).order_by('-date_created')
+        # Add comments with author information preloaded
+        comments = post.comments.filter(parent=None).select_related('author').order_by('-date_created')
         context['comments'] = comments
         context['comment_form'] = CommentForm()
         
@@ -116,8 +116,8 @@ class PostDetailView(DetailView):
         if self.request.user.is_authenticated:
             context['user_has_liked'] = post.likes.filter(id=self.request.user.id).exists()
         
-        # Related posts (same category or tags)
-        related_posts = Post.objects.filter(status='published')
+        # Related posts (same category or tags) with optimized queries
+        related_posts = Post.objects.filter(status='published').select_related('author', 'category')
         if post.category:
             related_posts = related_posts.filter(category=post.category)
         else:
