@@ -254,15 +254,21 @@ WSGI_APPLICATION = 'core.wsgi.application'
 if dj_database_url:
     try:
         DATABASE_URL = config('DATABASE_URL')
-        DATABASES = {
-            'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600)
-        }
-        # Additional PostgreSQL optimizations
-        DATABASES['default']['OPTIONS'] = {
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-            'charset': 'utf8mb4',
-        }
-        DATABASES['default']['CONN_MAX_AGE'] = 600
+        if 'sqlite' in DATABASE_URL:
+            # For SQLite, use simple configuration
+            DATABASES = {
+                'default': {
+                    'ENGINE': 'django.db.backends.sqlite3',
+                    'NAME': BASE_DIR / 'db.sqlite3',
+                }
+            }
+        else:
+            # For PostgreSQL, use dj_database_url
+            DATABASES = {
+                'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600)
+            }
+            # Additional PostgreSQL optimizations
+            DATABASES['default']['CONN_MAX_AGE'] = 600
     except:
         # Fallback to SQLite for development
         DATABASES = {
