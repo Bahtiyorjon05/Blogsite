@@ -6,3 +6,30 @@ django-taggit>=4.0.0
 djangorestframework>=3.14.0
 Pillow>=10.0.0
 python-decouple>=3.8
+
+# Database & Performance
+psycopg2-binary>=2.9.7
+django-redis>=5.3.0
+django-extensions>=3.2.3
+
+# API & Authentication
+djangorestframework-simplejwt>=5.3.0
+django-cors-headers>=4.3.0
+django-filter>=23.3
+
+# Security & Monitoring
+django-ratelimit>=4.1.0
+sentry-sdk[django]>=1.38.0
+
+# Search & Full-text
+django-elasticsearch-dsl>=8.0
+
+# Development & Testing
+django-debug-toolbar>=4.2.0
+pytest-django>=4.7.0
+factory-boy>=3.3.0
+coverage>=7.3.0
+
+# Frontend Integration
+django-webpack-loader>=2.0.1
+whitenoise[brotli]>=6.6.0
