@@ -2,6 +2,27 @@
 
 {% block title %}Welcome to PyBlog | Home{% endblock %}
 
+{% block extra_head %}
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="PyBlog - A beautiful place to share your Python journey and programming adventures. Learn, write, and connect with Python developers worldwide.">
+    <meta name="keywords" content="Python, programming, blog, coding, development, tutorials, community">
+    <meta name="author" content="PyBlog">
+    
+    <!-- Open Graph meta tags -->
+    <meta property="og:title" content="Welcome to PyBlog - Python Community Blog">
+    <meta property="og:description" content="A beautiful place to share your Python journey and programming adventures. Learn, write, and connect with Python developers worldwide.">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="PyBlog">
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% load static %}{% static 'logo.svg' %}">
+    
+    <!-- Twitter Card meta tags -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Welcome to PyBlog - Python Community Blog">
+    <meta name="twitter:description" content="A beautiful place to share your Python journey and programming adventures.">
+    <meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{% load static %}{% static 'logo.svg' %}">
+{% endblock %}
+
 {% block content %}
     <!-- Hero Section -->
     <section class="hero-section">

@@ -8,6 +8,8 @@ from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.views.decorators.cache import cache_page
+from django.core.cache import cache
 
 from .models import Post, Category, Tag, Comment, UserProfile
 from .forms import (PostForm, CommentForm, CustomUserCreationForm, 
@@ -20,20 +22,30 @@ from rest_framework import status, viewsets, permissions
 from .serializers import PostSerializer, CategorySerializer, TagSerializer, CommentSerializer, UserProfileSerializer
 
 
-# Home Page
+# Home Page with caching
+@cache_page(60 * 5)  # Cache for 5 minutes
 def home(request):
-    featured_posts = Post.objects.filter(status='published').order_by('-views')[:5]
-    recent_posts = Post.objects.filter(status='published').order_by('-date_created')[:5]
-    categories = Category.objects.annotate(post_count=Count('posts')).order_by('-post_count')[:10]
-    popular_tags = Tag.objects.annotate(post_count=Count('posts')).order_by('-post_count')[:15]
+    # Try to get from cache first
+    cache_key = 'home_page_data'
+    home_data = cache.get(cache_key)
     
-    context = {
-        'featured_posts': featured_posts,
-        'recent_posts': recent_posts,
-        'categories': categories,
-        'popular_tags': popular_tags,
-    }
-    return render(request, 'blog/home.html', context)
+    if not home_data:
+        featured_posts = Post.objects.filter(status='published').select_related('author', 'category').prefetch_related('tags').order_by('-views')[:5]
+        recent_posts = Post.objects.filter(status='published').select_related('author', 'category').order_by('-date_created')[:5]
+        categories = Category.objects.annotate(post_count=Count('posts')).order_by('-post_count')[:10]
+        popular_tags = Tag.objects.annotate(post_count=Count('posts')).order_by('-post_count')[:15]
+        
+        home_data = {
+            'featured_posts': list(featured_posts),
+            'recent_posts': list(recent_posts),
+            'categories': list(categories),
+            'popular_tags': list(popular_tags),
+        }
+        
+        # Cache for 5 minutes
+        cache.set(cache_key, home_data, 60 * 5)
+    
+    return render(request, 'blog/home.html', home_data)
 
 
 # Post List View
@@ -44,7 +56,7 @@ class PostListView(ListView):
     paginate_by = 9
     
     def get_queryset(self):
-        queryset = Post.objects.filter(status='published').order_by('-date_created')
+        queryset = Post.objects.filter(status='published').select_related('author', 'category').prefetch_related('tags', 'likes').order_by('-date_created')
         
         # Filter by category if provided
         category_slug = self.kwargs.get('category_slug')
@@ -56,18 +68,26 @@ class PostListView(ListView):
         if tag_slug:
             queryset = queryset.filter(tags__slug=tag_slug)
             
-        # Search functionality
+        # Search functionality with improved logic
         search_form = SearchForm(self.request.GET)
         if search_form.is_valid() and search_form.cleaned_data['query']:
             query = search_form.cleaned_data['query']
+            # Search in title with higher priority, then content
+            title_search = Q(title__icontains=query)
+            content_search = Q(content__icontains=query) | Q(excerpt__icontains=query)
+            author_search = Q(author__username__icontains=query) | Q(author__first_name__icontains=query) | Q(author__last_name__icontains=query)
+            category_search = Q(category__name__icontains=query)
+            tag_search = Q(tags__name__icontains=query)
+            
+            # Combine searches with OR
             queryset = queryset.filter(
-                Q(title__icontains=query) | 
-                Q(content__icontains=query) | 
-                Q(excerpt__icontains=query) |
-                Q(author__username__icontains=query) |
-                Q(category__name__icontains=query) |
-                Q(tags__name__icontains=query)
+                title_search | content_search | author_search | category_search | tag_search
             ).distinct()
+            
+            # Add search term to context for highlighting
+            self.search_query = query
+        else:
+            self.search_query = None
             
         return queryset
     
@@ -76,6 +96,10 @@ class PostListView(ListView):
         context['search_form'] = SearchForm(self.request.GET)
         context['categories'] = Category.objects.annotate(post_count=Count('posts'))
         context['popular_tags'] = Tag.objects.annotate(post_count=Count('posts')).order_by('-post_count')[:20]
+        
+        # Add search query for highlighting in templates
+        if hasattr(self, 'search_query') and self.search_query:
+            context['search_query'] = self.search_query
         
         # Add category or tag info if filtering
         category_slug = self.kwargs.get('category_slug')
@@ -107,8 +131,8 @@ class PostDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         post = self.object
         
-        # Add comments
-        comments = post.comments.filter(parent=None).order_by('-date_created')
+        # Add comments with author information preloaded
+        comments = post.comments.filter(parent=None).select_related('author').order_by('-date_created')
         context['comments'] = comments
         context['comment_form'] = CommentForm()
         
@@ -116,8 +140,8 @@ class PostDetailView(DetailView):
         if self.request.user.is_authenticated:
             context['user_has_liked'] = post.likes.filter(id=self.request.user.id).exists()
         
-        # Related posts (same category or tags)
-        related_posts = Post.objects.filter(status='published')
+        # Related posts (same category or tags) with optimized queries
+        related_posts = Post.objects.filter(status='published').select_related('author', 'category')
         if post.category:
             related_posts = related_posts.filter(category=post.category)
         else:
